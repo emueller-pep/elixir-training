@@ -33,6 +33,7 @@ defmodule Fussball do
   end
 
   def init(mycountry, othercountry) do
+    Process.flag(:trap_exit, true)
     Process.register(self(), mycountry)
     loop(mycountry, othercountry)
   end
