@@ -27,6 +27,8 @@ defmodule MyDb do
   def read(key) do call({ :read, key }) end
   def match(value) do call({ :match, value }) end
   def records() do call({ :records }) end
+  def lock() do call({ :lock }) end
+  def unlock() do call({ :unlock }) end
 
   defp call(message) do
     send(MyDb, { :request, self(), message })
@@ -36,12 +38,26 @@ defmodule MyDb do
   end
 
   # not actually public
-  def init() do loop(TreeDb.new) end
+  def init() do unlocked_loop(TreeDb.new) end
 
-  defp loop(db) do
+  defp unlocked_loop(db) do
     receive do
       { :destroy } -> TreeDb.destroy(db); :ok
-      { :request, from, message } -> loop(handle_request(db, from, message))
+      { :request, from, { :lock } } -> 
+        send(from, { :reply, :ok })
+        locked_loop(db, from)
+      { :request, from, message } ->
+        unlocked_loop(handle_request(db, from, message))
+    end
+  end
+
+  defp locked_loop(db, from) do
+    receive do
+      { :request, ^from, { :unlock } } ->
+        send(from, { :reply, :ok })
+        unlocked_loop(db)
+      { :request, ^from, message } ->
+        locked_loop(handle_request(db, from, message), from)
     end
   end
 
