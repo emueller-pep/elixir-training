@@ -45,6 +45,11 @@ defmodule ProcessRing do
     :ok
   end
 
+  def stop_all do
+    send(:ringleader, { :stop })
+    :ok
+  end
+
   defp loop(n, nil) do
     receive do
       { :init, next } ->
