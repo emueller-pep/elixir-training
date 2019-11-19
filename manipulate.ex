@@ -3,19 +3,24 @@ defmodule Manipulate do
   Work for 2.5 (ADVANCED: Manipulating Lists)
   """
 
+  @doc "filter out values failing a supplied predicate function"
+  def filter(list, function) do Manipulate.reverse(filter([], list, function)) end
+
+  defp filter(output, [], _function) do output end
+  defp filter(output, [record | remaining], function) do
+    if function.(record) do
+      filter([record | output], remaining, function)
+    else
+      filter(output, remaining, function)
+    end
+  end
+
+
   @doc """
   Given a list of integers, return all the values <= to a supplied value,
   retaining the initial ordering of all values
   """
-  def filter(list, n) do filter([], list, n) end
-  def filter(output, [], _n) do reverse(output) end
-  def filter(output, [head | rest], n) do
-    if head <= n do
-      filter([head | output], rest, n)
-    else
-      filter(output, rest, n)
-    end
-  end
+  def filtern(list, n) do filter(list, fn(x) -> x <= n end) end
 
   @doc """
   Given a list, produce a list which contains the same elements in the opposite order.

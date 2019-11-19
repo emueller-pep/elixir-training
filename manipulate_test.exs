@@ -4,10 +4,16 @@ defmodule ManipulateTest do
   use ExUnit.Case, async: true
 
   test "Manipulate.filter/2" do
-    assert Manipulate.filter([1, 2, 3, 4, 5, 6], 4) == [1, 2, 3, 4]
-    assert Manipulate.filter([5, 3, 1, 12, 4, 4], 4) == [3, 1, 4, 4]
-    assert Manipulate.filter([5, 5, 5], 4) == []
-    assert Manipulate.filter([], 0) == []
+    assert Manipulate.filter([], fn(x) -> x end) == []
+    assert Manipulate.filter([1, 2, 3, 4, 5], fn(x) -> rem(x, 2) == 0 end) == [2, 4]
+    assert Manipulate.filter([a: 1, b: 2, c: 3], fn({k, _v}) -> k != :b end) == [a: 1, c: 3]
+  end
+
+  test "Manipulate.filtern/2" do
+    assert Manipulate.filtern([1, 2, 3, 4, 5, 6], 4) == [1, 2, 3, 4]
+    assert Manipulate.filtern([5, 3, 1, 12, 4, 4], 4) == [3, 1, 4, 4]
+    assert Manipulate.filtern([5, 5, 5], 4) == []
+    assert Manipulate.filtern([], 0) == []
   end
 
   test "Manipulate.reverse/1" do
