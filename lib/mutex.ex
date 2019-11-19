@@ -41,14 +41,17 @@ defmodule Mutex do
     receive do
       { :wait, from } ->
         IO.puts("received a wait request from #{inspect from}")
-        send(from, { :granted})
-        IO.puts("send release to #{inspect from}")
+        send(from, { :granted })
         taken(from)
     end
   end
 
   defp taken(by_pid) do
     receive do
+      { :wait, ^by_pid } ->
+        IO.puts("received a wait request by #{inspect by_pid}, who already holds it")
+        send(by_pid, { :granted })
+        taken(by_pid)
       { :signal, ^by_pid } ->
         IO.puts("received a signal from #{inspect by_pid}")
         send(by_pid, { :released })
