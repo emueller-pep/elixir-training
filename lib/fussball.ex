@@ -43,6 +43,9 @@ defmodule Fussball do
       :stop ->
         :ok
 
+      {:EXIT, _pid, reason} ->
+        IO.puts("Got exit signal: #{inspect(reason)}"
+
       :save ->
         IO.puts("#{othercountry} just saved...")
         loop(mycountry, othercountry)
