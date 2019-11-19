@@ -35,6 +35,8 @@ defmodule Fussball do
   def init(mycountry, othercountry) do
     Process.flag(:trap_exit, true)
     Process.register(self(), mycountry)
+    other_pid = Process.whereis(othercountry)
+    if other_pid, do: Process.link(other_pid)
     loop(mycountry, othercountry)
   end
 
@@ -44,7 +46,7 @@ defmodule Fussball do
         :ok
 
       {:EXIT, _pid, reason} ->
-        IO.puts("Got exit signal: #{inspect(reason)}"
+        IO.puts("Got exit signal: #{inspect(reason)}")
 
       :save ->
         IO.puts("#{othercountry} just saved...")
