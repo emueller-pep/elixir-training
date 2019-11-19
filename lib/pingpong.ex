@@ -6,14 +6,14 @@
 
 defmodule Pingpong do
   def start() do
-    Process.register(spawn(Pingpong, :init_a, []), :a)
-    Process.register(spawn(Pingpong, :init_b, []), :b)
+    pid_a = spawn(Pingpong, :init_a, [])
+    Process.register(pid_a, :a)
+    Process.register(spawn(Pingpong, :init_b, [pid_a]), :b)
     :ok
   end
 
   def stop() do
     send(:a, :stop)
-    send(:b, :stop)
   end
 
   def send(n) do
@@ -25,14 +25,15 @@ defmodule Pingpong do
     loop_a()
   end
 
-  def init_b() do
+  def init_b(pid_a) do
+    Process.link(pid_a)
     loop_b()
   end
 
   defp loop_a() do
     receive do
       :stop ->
-        :ok
+        exit("ouch")
 
       {:msg, _msg, 0} ->
         loop_a()
@@ -51,9 +52,6 @@ defmodule Pingpong do
 
   defp loop_b() do
     receive do
-      :stop ->
-        :ok
-
       {:msg, _msg, 0} ->
         loop_b()
 
