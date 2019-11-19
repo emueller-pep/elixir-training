@@ -12,66 +12,23 @@ defmodule ProcessRing do
 
   @doc "start up the processes and connect them together"
   def start(n) do
-    pids = Enum.map(1..n, fn(x) ->
-      spawn(ProcessRing, :start_loop, [x - 1])
-    end)
-
-    Enum.each(1..n, fn(number) ->
-      [target, next] = ring_slice(pids, number - 1, 0, 1)
-      send(target, {:init, next})
-    end)
-
+    { :ok, pids } = RoutedRing.start(n, construct_routes(n))
     Process.register(List.first(pids), :ringleader)
     :ok
   end
 
-  defp ring_slice(list, index, start_offset, end_offset) do
-    len = length(list)
-    range = (index + start_offset .. index + end_offset)
-    Enum.map(range, fn(n) -> Enum.at(list, modulo(n, len)) end)
-  end
-
-  defp modulo(n, max) when n < 0 do max + rem(n, max) end
-  defp modulo(n, max) do rem(n, max) end
-
-  @doc "receive-loop for each item in the ring"
-  def start_loop(n) do
-    loop(n, nil)
+  def construct_routes(n) when n > 1 do
+    Enum.map((0..n-1), fn(i) -> { rem(i + n - 1, n), i, rem(i + 1, n) } end)
   end
 
   @doc "send this message for N hops around the ring"
   def pass_message(message, n) do
-    send(:ringleader, { :pass, message, n - 1 })
+    send(:ringleader, { :pass, nil, message, n - 1 })
     :ok
   end
 
   def stop_all do
     send(:ringleader, { :stop })
     :ok
-  end
-
-  defp loop(n, nil) do
-    receive do
-      { :init, next } ->
-        IO.puts("Initializing process #{n} (#{inspect self()})")
-        loop(n, next)
-      { :stop } -> :ok
-    end
-  end
-
-  defp loop(n, next) do
-    receive do
-      { :pass, message, 0 } ->
-        IO.puts("Process #{n} (#{inspect self()}) received #{message}, but it can go no further")
-        loop(n, next)
-      { :pass, message, remaining_hops } ->
-        IO.puts("Process #{n} (#{inspect self()}) received #{message}, #{remaining_hops} left")
-        send(next, {:pass, message, remaining_hops - 1})
-        loop(n, next)
-      { :stop } ->
-        send(next, {:stop})
-        IO.puts("Process #{n} (#{inspect self()}) shutting down")
-        :ok
-    end
   end
 end
