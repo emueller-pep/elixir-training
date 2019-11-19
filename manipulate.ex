@@ -37,7 +37,9 @@ defmodule Manipulate do
   defp rconcat2([], l2) do l2 end
   defp rconcat2([r1_head | r1_rest], l2) do rconcat2(r1_rest, [r1_head | l2]) end
 
-  defp map(list, function) do reverse(map([], list, function)) end
+  @doc "apply a supplied function to every item in a list and return the results"
+  def map(list, function) do reverse(map([], list, function)) end
+
   defp map(output, [], _function) do output end
   defp map(output, [head | rest], function) do map([function.(head) | output], rest, function) end
 
