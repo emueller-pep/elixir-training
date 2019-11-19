@@ -5,6 +5,18 @@
 ###############################################################################
 
 defmodule Fussball do
+  def easy() do
+    start(:england, :spain)
+    :timer.sleep(200)
+    start(:spain, :england)
+    :timer.sleep(200)
+    kickoff(:spain)
+  end
+
+  def halt() do
+    stop(:england)
+    stop(:spain)
+  end
 
   def start(mycountry, othercountry) do
     spawn(Fussball, :init, [mycountry, othercountry])
