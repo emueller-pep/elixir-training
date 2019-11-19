@@ -1,5 +1,3 @@
-ExUnit.start()
-
 defmodule TreeDbTest do
   use ExUnit.Case, async: true
   doctest TreeDb

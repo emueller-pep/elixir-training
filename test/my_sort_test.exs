@@ -1,5 +1,3 @@
-ExUnit.start()
-
 defmodule MySortTest do
   use ExUnit.Case, async: true
   doctest MySort

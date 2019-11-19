@@ -1,5 +1,3 @@
-ExUnit.start()
-
 defmodule DbTest do
   use ExUnit.Case, async: true
   doctest Db

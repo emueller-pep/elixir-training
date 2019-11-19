@@ -1,5 +1,3 @@
-ExUnit.start()
-
 defmodule ManipulateTest do
   use ExUnit.Case, async: true
   doctest Manipulate
