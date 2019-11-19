@@ -1,19 +1,19 @@
 defmodule EchoServer do
-  # @moduledoc """
-  # Write a server which will wait in a receive loop until a message is sent to it. Depending on
-  # the message, it should either print it and loop again or terminate. You want to hide the fact
-  # that you are dealing with a process, and access its services through a functional interface.
-  # These functions will spawn the process and send messages to it. The module Echo should export
-  # the following functions.
+  @moduledoc """
+  Write a server which will wait in a receive loop until a message is sent to it. Depending on
+  the message, it should either print it and loop again or terminate. You want to hide the fact
+  that you are dealing with a process, and access its services through a functional interface.
+  These functions will spawn the process and send messages to it. The module Echo should export
+  the following functions.
 
-  # Echo.start() → :ok
-  # Echo.stop() → :ok
-  # Echo.print(term) → :ok<Paste>
+  Echo.start() → :ok
+  Echo.stop() → :ok
+  Echo.print(term) → :ok<Paste>
 
-  # Hint: Use the Process.register/2 built in function.
-  # Warning: Use an internal message protocol to avoid stopping the process when you for example
-  # call the function Echo.print(:stop)
-  # """
+  Hint: Use the Process.register/2 built in function.
+  Warning: Use an internal message protocol to avoid stopping the process when you for example
+  call the function Echo.print(:stop)
+  """
 
   @doc "start the receive-loop and return the server reference"
   def start() do
