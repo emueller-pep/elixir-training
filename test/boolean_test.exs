@@ -2,6 +2,7 @@ ExUnit.start()
 
 defmodule BooleanTest do
   use ExUnit.Case, async: true
+  doctest Boolean
 
   test "Boolean.b_not" do
     assert Boolean.b_not(true) == false

@@ -2,6 +2,7 @@ ExUnit.start()
 
 defmodule SequentialTest do
   use ExUnit.Case, async: true
+  doctest Sequential
 
   test "Sequential.sum/1" do
     assert Sequential.sum(1) == 1

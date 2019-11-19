@@ -2,6 +2,7 @@ ExUnit.start()
 
 defmodule DbTest do
   use ExUnit.Case, async: true
+  doctest Db
 
   test "Db.new/0" do
     assert Db.new == []

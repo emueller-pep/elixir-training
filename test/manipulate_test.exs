@@ -2,6 +2,7 @@ ExUnit.start()
 
 defmodule ManipulateTest do
   use ExUnit.Case, async: true
+  doctest Manipulate
 
   test "Manipulate.filter/2" do
     assert Manipulate.filter([], fn(x) -> x end) == []

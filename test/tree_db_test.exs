@@ -2,6 +2,7 @@ ExUnit.start()
 
 defmodule TreeDbTest do
   use ExUnit.Case, async: true
+  doctest TreeDb
 
   test "TreeDb.new/0" do
     assert TreeDb.new == :empty

@@ -2,6 +2,7 @@ ExUnit.start()
 
 defmodule TempTest do
   use ExUnit.Case, async: true
+  doctest Temp
 
   test "Temp.f2c" do
     assert_in_delta Temp.f2c(32), 0, 0.001
