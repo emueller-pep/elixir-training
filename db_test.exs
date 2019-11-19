@@ -21,7 +21,7 @@ defmodule DbTest do
 
   test "Db.delete/2" do
     db = [baz: 3, foo: :bar] |> Db.delete(:foo)
-    assert db == [{:baz, 3}]
+    assert db == [baz: 3]
 
     db = [baz: 3, foo: :bar] |> Db.delete(:baz)
     assert db == [foo: :bar]
