@@ -47,7 +47,9 @@ defmodule ProcessRing do
 
   defp loop(n, nil) do
     receive do
-      { :init, next } -> loop(n, next)
+      { :init, next } ->
+        IO.puts("Initializing process #{n} (#{inspect self()})")
+        loop(n, next)
       { :stop } -> :ok
     end
   end
@@ -63,6 +65,7 @@ defmodule ProcessRing do
         loop(n, next)
       { :stop } ->
         send(next, {:stop})
+        IO.puts("Process #{n} (#{inspect self()}) shutting down")
         :ok
     end
   end
