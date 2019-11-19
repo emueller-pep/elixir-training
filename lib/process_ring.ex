@@ -41,7 +41,7 @@ defmodule ProcessRing do
 
   @doc "send this message for N hops around the ring"
   def pass_message(message, n) do
-    send(:ringleader, { :pass, message, n })
+    send(:ringleader, { :pass, message, n - 1 })
   end
 
   defp loop(n, nil) do
