@@ -26,4 +26,10 @@ defmodule HigherOrderTest do
     assert HigherOrder.concatenate([]) == []
     assert HigherOrder.concatenate([[], []]) == []
   end
+
+  test "sum/1" do
+    assert HigherOrder.sum([]) == 0
+    assert HigherOrder.sum([1, 2, 3, 4, 5]) == 15
+    assert HigherOrder.sum([5, -5, 5, -5, 2]) == 2
+  end
 end

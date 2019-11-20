@@ -40,4 +40,8 @@ defmodule HigherOrder do
     concat2 = fn(list, acc) -> acc ++ list end;
     Enum.reduce(lol, concat2)
   end
+
+  @doc "produce sum from a list of numbers"
+  def sum([]) do 0 end
+  def sum(list) do Enum.reduce(list, &(&1 + &2)) end
 end
