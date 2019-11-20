@@ -23,4 +23,21 @@ defmodule HigherOrder do
     below_threshold? = fn(i) -> i < threshold end
     Enum.filter(list, below_threshold?)
   end
+
+  # Using funs and higher order functions, write a function which prints out the even integers
+  # between 1 and n. Hint: Solve your problem either in two steps, or use two clauses in your fun.
+  @doc "produce the evven integers from 1-n"
+  def select_evens_to(n) when n > 0 do
+    even? = fn(x) -> rem(x, 2) == 0 end
+    Enum.filter((1..n), even?)
+  end
+
+  # Using funs and higher order functions, write a function which, given a list of lists,
+  # will concatenate them.
+  @doc "concatenate a list of lists"
+  def concatenate([]) do [] end
+  def concatenate(lol) do
+    concat2 = fn(list, acc) -> acc ++ list end;
+    Enum.reduce(lol, concat2)
+  end
 end
