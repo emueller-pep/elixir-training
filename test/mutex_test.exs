@@ -25,6 +25,8 @@ defmodule MutexTest do
       :ping ->
         send(owner, { self(), :pong })
         loop(mutex_name, owner)
+      :die ->
+        raise "if you insist"
       _ ->
         send(owner, { self(), :error })
         loop(mutex_name, owner)
@@ -36,7 +38,7 @@ defmodule MutexTest do
     receive do
       { ^pid, response } -> response
     after
-      ^timeout -> :timeout
+      timeout -> :timeout
     end
   end
 
@@ -71,5 +73,17 @@ defmodule MutexTest do
 
     call(abe, :stop, 50)
     call(ben, :stop, 50)
+  end
+
+  test "exit handling" do
+    assert Mutex.start(:error_handling) == :ok
+    abe = spawn(MutexTest, :loop, [:error_handling, self()])
+    ben = spawn(MutexTest, :loop, [:error_handling, self()])
+
+    assert call(abe, :take, 50) == :taken
+    assert call(ben, :take, 50) == :timeout
+
+    send(abe, :die)
+    assert call(ben, :take, 50) == :taken
   end
 end

@@ -38,6 +38,7 @@ defmodule Mutex do
 
   # not really public
   def init do
+    Process.flag(:trap_exit, true)
     available()
   end
 
@@ -46,12 +47,17 @@ defmodule Mutex do
       { :wait, from } ->
         IO.puts("received a wait request from #{inspect from}")
         send(from, { :granted })
+        Process.link(from)
         taken(from)
     end
   end
 
   defp taken(by_pid) do
     receive do
+      { :EXIT, ^by_pid, _reason } ->
+        Process.unlink(by_pid)
+        IO.puts("received a signal from #{inspect by_pid}. They must have died, releasing the lock")
+        available()
       { :wait, ^by_pid } ->
         IO.puts("received a wait request by #{inspect by_pid}, who already holds it")
         send(by_pid, { :granted })
