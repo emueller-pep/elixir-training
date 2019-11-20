@@ -8,9 +8,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install elixir
-      run: apt-get install elixir
     - uses: actions/checkout@v1
+    - uses: actions/setup-elixir@v1.0.0
+      with:
+        otp-version: 22.x
+        elixir-version: 1.9.x
     - name: Run a one-line script
       run: mix compile
     - name: Run a multi-line script
