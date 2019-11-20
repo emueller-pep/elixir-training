@@ -13,12 +13,14 @@ defmodule Mutex do
   Hint: The difference in the state of your FSM is which messages you handle in which state.
   """
 
+  @doc "Set up a particular mutex to be used"
   def start(name) do
     pid = spawn(Mutex, :init, [])
     Process.register(pid, name)
     :ok
   end
 
+  @doc "claim the mutex for the current process"
   def wait(name) do
     send(name, { :wait, self() })
     receive do
@@ -26,6 +28,7 @@ defmodule Mutex do
     end
   end
 
+  @doc "release the mutex from the current process"
   def signal(name) do
     send(name, { :signal, self() })
     receive do
@@ -33,6 +36,7 @@ defmodule Mutex do
     end
   end
 
+  # not really public
   def init do
     available()
   end
