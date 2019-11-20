@@ -45,8 +45,6 @@ defmodule MutexTest do
   test "the testing setup loop" do
     assert Mutex.start(:testing_setup) == :ok
     pid = spawn(MutexTest, :loop, [:testing_setup, self()])
-    IO.puts "The spawned pid is #{inspect pid}"
-    IO.puts "The test script's pid is #{inspect self()}"
     assert call(pid, :ping, 50) == :pong
     assert call(pid, :ping, 50) == :pong
     assert call(pid, :foo, 50) == :error
