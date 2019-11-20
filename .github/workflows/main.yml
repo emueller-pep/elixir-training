@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Install elixir
+      run: apt-get install elixir
     - uses: actions/checkout@v1
     - name: Run a one-line script
       run: mix compile
