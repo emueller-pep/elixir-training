@@ -1,21 +1,14 @@
-# Training
+# Elixir Training
 
-**TODO: Add description**
+No dependencies but elixir
 
-## Installation
+```
+# on OSX
+brew install elixir
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `training` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:training, "~> 0.1.0"}
-  ]
-end
+# on Ubuntu
+sudo apt-get install esl-erlang
+sudo apt-get install elixir
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/training](https://hexdocs.pm/training).
-
+Working through the problems posed as part of our 1-week elixir training course.
