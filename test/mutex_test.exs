@@ -26,7 +26,7 @@ defmodule MutexTest do
         send(owner, { self(), :pong })
         loop(mutex_name, owner)
       :die ->
-        raise "if you insist"
+        Process.exit(self(), :intentional)
       _ ->
         send(owner, { self(), :error })
         loop(mutex_name, owner)
