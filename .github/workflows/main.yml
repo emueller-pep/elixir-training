@@ -13,7 +13,9 @@ jobs:
       with:
         otp-version: 22.x
         elixir-version: 1.9.x
-    - name: Run a one-line script
+    - name: Fetch dependencies
+      run: mix deps.get
+    - name: Compile the project
       run: mix compile
-    - name: Run a multi-line script
+    - name: Run the tests
       run: mix test
