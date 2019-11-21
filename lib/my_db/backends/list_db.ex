@@ -1,4 +1,4 @@
-defmodule Db do
+defmodule MyDb.Backends.ListDb do
   @moduledoc """
   Implement an in-memory database system.
 
@@ -28,8 +28,9 @@ defmodule Db do
 
   @doc "find all of the keys that match a given value"
   def match(db, value) do
-    find_records_by_value(db, value)
-    |> Manipulate.map(fn {k, _v} -> k end)
+    results = find_records_by_value(db, value)
+              |> Manipulate.map(fn {k, _v} -> k end)
+    { :ok, results }
   end
 
   defp find_records_by_key(db, key) do Manipulate.filter(db, fn {k, _v} -> k == key end) end

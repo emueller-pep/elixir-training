@@ -1,4 +1,4 @@
-defmodule StructDb do
+defmodule MyDb.Backends.StructDb do
   @moduledoc """
   Take the db.ex module you wrote in exercise 2.4. Rewrite it using maps. Test it using your
   database server you wrote in exercise 4.1.
@@ -37,7 +37,8 @@ defmodule StructDb do
 
   @doc "find all keys having the supplied value in the database"
   def match(db, value) do
-    Enum.filter(db, fn %Record{value: v} -> v == value end)
-    |> Enum.map(fn record -> record.key end)
+    results = Enum.filter(db, fn %Record{value: v} -> v == value end)
+              |> Enum.map(fn record -> record.key end)
+    { :ok, results }
   end
 end

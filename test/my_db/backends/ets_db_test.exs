@@ -1,4 +1,5 @@
-defmodule EtsDbTest do
+defmodule MyDb.Backends.EtsDbTest do
+  alias MyDb.Backends.EtsDb, as: EtsDb
   use ExUnit.Case, async: true
   doctest EtsDb
   

@@ -1,4 +1,5 @@
-defmodule TreeDbTest do
+defmodule MyDb.Backends.TreeDbTest do
+  alias MyDb.Backends.TreeDb, as: TreeDb
   use ExUnit.Case, async: true
   doctest TreeDb
 
@@ -53,8 +54,8 @@ defmodule TreeDbTest do
 
   test "TreeDb.match/2" do
     db = TreeDb.new([foo: 1, bar: 2, baz: 3, bar: 7, bim: 2])
-    assert TreeDb.match(db, 1) == [:foo]
-    assert TreeDb.match(db, 3) == [:baz]
-    assert TreeDb.match(db, 2) == [:bar, :bim]
+    assert TreeDb.match(db, 1) == { :ok, [:foo] }
+    assert TreeDb.match(db, 3) == { :ok, [:baz] }
+    assert TreeDb.match(db, 2) == { :ok, [:bar, :bim] }
   end
 end

@@ -1,4 +1,4 @@
-defmodule EtsDb do
+defmodule MyDb.Backends.EtsDb do
   @moduledoc """
   Implement an ETS backed database system
   """
@@ -9,8 +9,8 @@ defmodule EtsDb do
 
   @doc "create a new database"
   def new do
-    table_id = :ets.new(EtsDb, [:ordered_set, :private])
-    %Table{table_id: table_id, name: EtsDb}
+    table_id = :ets.new(MyDb.Backends.EtsDb, [:ordered_set, :private])
+    %Table{table_id: table_id, name: MyDb.Backends.EtsDb}
   end
 
   @doc "create a new database and initialize it with data"

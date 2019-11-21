@@ -1,88 +1,34 @@
 defmodule MyDb do
   @moduledoc """
-  Write a database server that stores a database in its loop data. You should register the server
-  and access its services through a functional interface. Exported functions in the MyDb module
-  should include:
+  MyDb module (lib/my_db.ex) is intended to be an API module to a database. Imple-
+  ment its functions by forwarding the calls to the DbServer module. The API should
+  be as follows:
 
   MyDb.start() → :ok
   MyDb.stop() → :ok
   MyDb.write(key, element) → :ok
-  MyDb.delete(key) → :ok
-  MyDb.read(key) → {:ok, element} | {:error, :instance}
-  MyDb.match(element) → [key1, ..., keyn]
+  MyDb.read(key) →{:ok, element} | {:error, :instance} MyDb.delete(key) → :ok
+  MyDb.match(element) → {:ok, [key1, ..., keyn]}
   """
 
-  def start() do
-    pid = spawn(MyDb, :init, [])
-    Process.register(pid, MyDb)
-    :ok
-  end
+  alias MyDb.DbServer, as: Server
 
-  def stop() do
-    send(MyDb, { :destroy })
-  end
+  @doc "Start the database server"
+  def start(%{backend: backend}) do Server.start(backend) end
+  def start do Server.start end
 
-  def write(key, value) do call({ :write, key, value }) end
-  def delete(key) do call({ :delete, key }) end
-  def read(key) do call({ :read, key }) end
-  def match(value) do call({ :match, value }) end
-  def records() do call({ :records }) end
-  def lock() do call({ :lock }) end
-  def unlock() do call({ :unlock }) end
+  @doc "Stop the database server"
+  def stop do Server.stop end
 
-  defp call(message) do
-    send(MyDb, { :request, self(), message })
-    receive do
-      { :reply, reply } -> reply
-    end
-  end
+  @doc "Write a key-value pair into the database"
+  def write(key, value) do Server.write(key, value) end
 
-  # not actually public
-  def init() do unlocked_loop(TreeDb.new) end
+  @doc "Delete a key-value pair from the database (given the key)"
+  def delete(key) do Server.delete(key) end
 
-  defp unlocked_loop(db) do
-    receive do
-      { :destroy } -> TreeDb.destroy(db); :ok
-      { :request, from, { :lock } } -> 
-        send(from, { :reply, :ok })
-        locked_loop(db, from)
-      { :request, from, message } ->
-        unlocked_loop(handle_request(db, from, message))
-    end
-  end
+  @doc "Read the value from the database for a given key"
+  def read(key) do Server.read(key) end
 
-  defp locked_loop(db, from) do
-    receive do
-      { :request, ^from, { :unlock } } ->
-        send(from, { :reply, :ok })
-        unlocked_loop(db)
-      { :request, ^from, message } ->
-        locked_loop(handle_request(db, from, message), from)
-    end
-  end
-
-  defp handle_request(db, from, message) do
-    case message do
-      { :write, key, value } ->
-        db = TreeDb.write(db, key, value)
-        send(from, { :reply, :ok })
-        db
-      { :read, key } ->
-        result = TreeDb.read(db, key)
-        send(from, { :reply, result })
-        db
-      { :delete, key } ->
-        db = TreeDb.delete(db, key)
-        send(from, { :reply, :ok })
-        db
-      { :match, value } ->
-        results = TreeDb.match(db, value)
-        send(from, { :reply, results })
-        db
-      { :records } ->
-        results = TreeDb.records(db)
-        send(from, { :reply, results })
-        db
-    end
-  end
+  @doc "Find all keys that have a specified value in the database"
+  def match(value) do Server.match(value) end
 end

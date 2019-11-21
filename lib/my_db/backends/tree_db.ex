@@ -1,4 +1,4 @@
-defmodule TreeDb do
+defmodule MyDb.Backends.TreeDb do
   @moduledoc """
   Implement an in-memory database system.
 
@@ -14,7 +14,7 @@ defmodule TreeDb do
 
   defp from_records(db, []) do db end
   defp from_records(db, [{ key, value } | rest]) do
-    from_records(TreeDb.write(db, key, value), rest)
+    from_records(write(db, key, value), rest)
   end
 
   @doc "clean up an existing database"
@@ -60,9 +60,10 @@ defmodule TreeDb do
 
   @doc "find the keys of all of the records matching a given value"
   def match(db, value) do
-    records(db)
+    results = records(db)
     |> Manipulate.filter(fn({ _k, v }) -> v == value end)
     |> Manipulate.map(fn({ k, _v }) -> k end)
+    { :ok, results }
   end
 
   @doc "print all records"
