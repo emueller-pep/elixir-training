@@ -1,4 +1,4 @@
-defmodule StructDb do
+defmodule MyDb.Backends.StructDb do
   @moduledoc """
   Take the db.ex module you wrote in exercise 2.4. Rewrite it using maps. Test it using your
   database server you wrote in exercise 4.1.

@@ -1,4 +1,5 @@
-defmodule StructDbTest do
+defmodule MyDb.Backends.StructDbTest do
+  alias MyDb.Backends.StructDb, as: StructDb
   use ExUnit.Case, async: true
   doctest StructDb
 
