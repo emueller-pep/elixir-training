@@ -37,7 +37,8 @@ defmodule MyDb.Backends.StructDb do
 
   @doc "find all keys having the supplied value in the database"
   def match(db, value) do
-    Enum.filter(db, fn %Record{value: v} -> v == value end)
-    |> Enum.map(fn record -> record.key end)
+    results = Enum.filter(db, fn %Record{value: v} -> v == value end)
+              |> Enum.map(fn record -> record.key end)
+    { :ok, results }
   end
 end

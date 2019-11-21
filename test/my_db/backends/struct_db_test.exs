@@ -40,8 +40,10 @@ defmodule MyDb.Backends.StructDbTest do
 
   test "StructDb.match/2" do
     db = StructDb.new([foo: 1, bar: 2, baz: 3, bim: 2])
-    assert StructDb.match(db, 1) == [:foo]
-    assert StructDb.match(db, 3) == [:baz]
-    assert Enum.sort(StructDb.match(db, 2)) == [:bar, :bim]
+    assert StructDb.match(db, 1) == { :ok, [:foo] }
+    assert StructDb.match(db, 3) == { :ok, [:baz] }
+
+    { :ok, matches } = StructDb.match(db, 2)
+    assert Enum.sort(matches) == [:bar, :bim]
   end
 end
