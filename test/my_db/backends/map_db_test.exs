@@ -1,4 +1,5 @@
-defmodule MapDbTest do
+defmodule MyDb.Backends.MapDbTest do
+  alias MyDb.Backends.MapDb, as: MapDb
   use ExUnit.Case, async: true
   doctest MapDb
 

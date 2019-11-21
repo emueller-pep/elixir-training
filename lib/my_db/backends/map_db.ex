@@ -1,4 +1,4 @@
-defmodule MapDb do
+defmodule MyDb.Backends.MapDb do
   @moduledoc """
   Take the db.ex module you wrote in exercise 2.4. Rewrite it using maps. Test it using your
   database server you wrote in exercise 4.1.
@@ -29,7 +29,7 @@ defmodule MapDb do
 
   @doc "find all keys having the supplied value in the database"
   def match(db, value) do
-    Enum.filter(db, fn({k,v}) -> v == value end)
+    Enum.filter(db, fn({_k,v}) -> v == value end)
     |> Enum.map(fn({k,_v}) -> k end)
   end
 end
