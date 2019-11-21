@@ -60,9 +60,10 @@ defmodule MyDb.Backends.TreeDb do
 
   @doc "find the keys of all of the records matching a given value"
   def match(db, value) do
-    records(db)
+    results = records(db)
     |> Manipulate.filter(fn({ _k, v }) -> v == value end)
     |> Manipulate.map(fn({ k, _v }) -> k end)
+    { :ok, results }
   end
 
   @doc "print all records"
