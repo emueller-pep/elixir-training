@@ -36,8 +36,10 @@ defmodule MyDb.Backends.MapDbTest do
 
   test "MapDb.match/2" do
     db = %{foo: 1, bar: 2, baz: 3, bim: 2}
-    assert MapDb.match(db, 1) == [:foo]
-    assert MapDb.match(db, 3) == [:baz]
-    assert MapDb.match(db, 2) == [:bar, :bim]
+    assert MapDb.match(db, 1) == { :ok, [:foo] }
+    assert MapDb.match(db, 3) == { :ok, [:baz] }
+
+    { :ok, matches } = MapDb.match(db, 2)
+    assert Enum.sort(matches) == [:bar, :bim]
   end
 end

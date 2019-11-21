@@ -29,7 +29,8 @@ defmodule MyDb.Backends.MapDb do
 
   @doc "find all keys having the supplied value in the database"
   def match(db, value) do
-    Enum.filter(db, fn({_k,v}) -> v == value end)
-    |> Enum.map(fn({k,_v}) -> k end)
+    results = Enum.filter(db, fn({_k,v}) -> v == value end)
+              |> Enum.map(fn({k,_v}) -> k end)
+    { :ok, results }
   end
 end
