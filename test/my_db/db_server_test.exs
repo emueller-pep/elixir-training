@@ -4,7 +4,7 @@ defmodule MyDb.DbServerTest do
   doctest MyDb.DbServer
 
   test "write/2" do
-    :ok = Server.start(:tree_db)
+    :ok = Server.start
     assert Server.read(:foo) == { :error, :instance }
     assert Server.write(:foo, 5)
     assert Server.read(:foo) == { :ok, 5 }
@@ -12,7 +12,7 @@ defmodule MyDb.DbServerTest do
   end
 
   test "delete/1" do
-    :ok = Server.start(:tree_db)
+    :ok = Server.start
     Server.write(:foo, 5)
     Server.write(:bar, 6)
 
@@ -23,7 +23,7 @@ defmodule MyDb.DbServerTest do
   end
 
   test "read/1" do
-    :ok = Server.start(:tree_db)
+    :ok = Server.start
     Server.write(:foo, 5)
     Server.write(:bar, 6)
 
@@ -33,7 +33,7 @@ defmodule MyDb.DbServerTest do
   end
 
   test "match/1" do
-    :ok = Server.start(:tree_db)
+    :ok = Server.start
     Server.write(:foo, 5)
     Server.write(:bar, 6)
     Server.write(:bam, 5)

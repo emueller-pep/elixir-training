@@ -20,6 +20,8 @@ defmodule MyDb.DbServer do
     struct_db:  MyDb.Backends.StructDb,
   }
 
+  def start do start(:map_db) end
+
   def start(backend_name) do
     { :ok, backend } = Map.fetch(@backends, backend_name)
     pid = spawn(MyDb.DbServer, :init, [backend])
