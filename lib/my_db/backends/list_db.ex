@@ -1,4 +1,4 @@
-defmodule Db do
+defmodule MyDb.Backends.ListDb do
   @moduledoc """
   Implement an in-memory database system.
 
