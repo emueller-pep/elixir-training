@@ -1,4 +1,4 @@
-defmodule MyDb do
+defmodule MyDb.DbServer do
   @moduledoc """
   Write a database server that stores a database in its loop data. You should register the server
   and access its services through a functional interface. Exported functions in the MyDb module
@@ -12,14 +12,24 @@ defmodule MyDb do
   MyDb.match(element) → [key1, ..., keyn]
   """
 
-  def start() do
-    pid = spawn(MyDb, :init, [])
-    Process.register(pid, MyDb)
+  @backends %{
+    map_db:     MyDb.Backends.MapDb,
+    tree_db:    MyDb.Backends.TreeDb,
+    list_db:    MyDb.Backends.ListDb,
+    ets_db:     MyDb.Backends.EtsDb,
+    struct_db:  MyDb.Backends.StructDb,
+  }
+
+  def start(backend_name) do
+    { :ok, backend } = Map.fetch(@backends, backend_name)
+    pid = spawn(MyDb.DbServer, :init, [backend])
+    Process.register(pid, MyDb.DbServer)
     :ok
   end
 
   def stop() do
-    send(MyDb, { :destroy })
+    send(MyDb.DbServer, { :destroy })
+    :ok
   end
 
   def write(key, value) do call({ :write, key, value }) end
@@ -31,56 +41,60 @@ defmodule MyDb do
   def unlock() do call({ :unlock }) end
 
   defp call(message) do
-    send(MyDb, { :request, self(), message })
+    send(MyDb.DbServer, { :request, self(), message })
     receive do
       { :reply, reply } -> reply
     end
   end
 
   # not actually public
-  def init() do unlocked_loop(TreeDb.new) end
+  def init(backend) do
+    unlocked_loop(backend, backend.new)
+  end
 
-  defp unlocked_loop(db) do
+  defp unlocked_loop(backend, db) do
     receive do
-      { :destroy } -> TreeDb.destroy(db); :ok
+      { :destroy } -> backend.destroy(db); :ok
       { :request, from, { :lock } } -> 
         send(from, { :reply, :ok })
-        locked_loop(db, from)
+        locked_loop(backend, db, from)
       { :request, from, message } ->
-        unlocked_loop(handle_request(db, from, message))
+        db = handle_request(backend, db, from, message)
+        unlocked_loop(backend, db)
     end
   end
 
-  defp locked_loop(db, from) do
+  defp locked_loop(backend, db, from) do
     receive do
       { :request, ^from, { :unlock } } ->
         send(from, { :reply, :ok })
-        unlocked_loop(db)
+        unlocked_loop(backend, db)
       { :request, ^from, message } ->
-        locked_loop(handle_request(db, from, message), from)
+        db = handle_request(backend, db, from, message)
+        locked_loop(backend, db, from)
     end
   end
 
-  defp handle_request(db, from, message) do
+  defp handle_request(backend, db, from, message) do
     case message do
       { :write, key, value } ->
-        db = TreeDb.write(db, key, value)
+        db = backend.write(db, key, value)
         send(from, { :reply, :ok })
         db
       { :read, key } ->
-        result = TreeDb.read(db, key)
+        result = backend.read(db, key)
         send(from, { :reply, result })
         db
       { :delete, key } ->
-        db = TreeDb.delete(db, key)
+        db = backend.delete(db, key)
         send(from, { :reply, :ok })
         db
       { :match, value } ->
-        results = TreeDb.match(db, value)
+        results = backend.match(db, value)
         send(from, { :reply, results })
         db
       { :records } ->
-        results = TreeDb.records(db)
+        results = backend.records(db)
         send(from, { :reply, results })
         db
     end
