@@ -36,8 +36,8 @@ defmodule MyDb.Backends.ListDbTest do
 
   test "match/2" do
     db = [foo: 1, bar: 2, baz: 3, bar: 7, bim: 2]
-    assert ListDb.match(db, 1) == [:foo]
-    assert ListDb.match(db, 3) == [:baz]
-    assert ListDb.match(db, 2) == [:bar, :bim]
+    assert ListDb.match(db, 1) == { :ok, [:foo] }
+    assert ListDb.match(db, 3) == { :ok, [:baz] }
+    assert ListDb.match(db, 2) == { :ok, [:bar, :bim] }
   end
 end
