@@ -43,8 +43,8 @@ defmodule EtsDbTest do
     assert Enum.sort(matches) == [:a, :d]
 
     # Check the $1 case specially
-    db = EtsDb.new([{"a", "$1"}, {"b", "$2"}])
-    assert EtsDb.match(db, "$1") == { :ok, ["a"] }
+    db = EtsDb.new([{"a", :"$1"}, {"b", :"$2"}])
+    assert EtsDb.match(db, :"$1") == { :ok, ["a"] }
   end
 
   test "records/1" do
