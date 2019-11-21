@@ -1,4 +1,4 @@
-defmodule TreeDb do
+defmodule MyDb.Backends.TreeDb do
   @moduledoc """
   Implement an in-memory database system.
 
@@ -14,7 +14,7 @@ defmodule TreeDb do
 
   defp from_records(db, []) do db end
   defp from_records(db, [{ key, value } | rest]) do
-    from_records(TreeDb.write(db, key, value), rest)
+    from_records(write(db, key, value), rest)
   end
 
   @doc "clean up an existing database"

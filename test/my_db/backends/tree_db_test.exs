@@ -1,4 +1,5 @@
-defmodule TreeDbTest do
+defmodule MyDb.Backends.TreeDbTest do
+  alias MyDb.Backends.TreeDb, as: TreeDb
   use ExUnit.Case, async: true
   doctest TreeDb
 
