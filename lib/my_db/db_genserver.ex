@@ -5,48 +5,50 @@ defmodule MyDb.DbGenserver do
   implement a database server using Genserver
   """
 
-  ## Client API ---------------------------------------------------------------
+  defmodule Client do
+    @moduledoc "The methods used by the client to communicate with the server"
 
-  def start do
-    start(MyDb.Backends.MapDb)
-  end
+    def start do
+      start(MyDb.Backends.MapDb)
+    end
 
-  def start(backend) do
-    {:ok, _pid} = GenServer.start_link(MyDb.DbGenserver, backend, name: MyDb.DbGenserver)
-    :ok
-  end
+    def start(backend) do
+      {:ok, _pid} = GenServer.start_link(MyDb.DbGenserver, backend, name: MyDb.DbGenserver)
+      :ok
+    end
 
-  def stop do
-    pid = Process.whereis(MyDb.DbGenserver)
-    IO.puts("trying to stop #{inspect({MyDb.DbGenserver, :normal, 1_000})} (#{inspect(pid)})")
-    :ok = GenServer.stop(MyDb.DbGenserver, :normal, 1_000)
-    :ok
-  end
+    def stop do
+      pid = Process.whereis(MyDb.DbGenserver)
+      IO.puts("trying to stop #{inspect({MyDb.DbGenserver, :normal, 1_000})} (#{inspect(pid)})")
+      :ok = GenServer.stop(MyDb.DbGenserver, :normal, 1_000)
+      :ok
+    end
 
-  def write(key, value) do
-    GenServer.call(MyDb.DbGenserver, {:write, key, value})
-  end
+    def write(key, value) do
+      GenServer.call(MyDb.DbGenserver, {:write, key, value})
+    end
 
-  def delete(key) do
-    GenServer.call(MyDb.DbGenserver, {:delete, key})
-  end
+    def delete(key) do
+      GenServer.call(MyDb.DbGenserver, {:delete, key})
+    end
 
-  def read(key) do
-    GenServer.call(MyDb.DbGenserver, {:read, key})
-  end
+    def read(key) do
+      GenServer.call(MyDb.DbGenserver, {:read, key})
+    end
 
-  def match(value) do
-    GenServer.call(MyDb.DbGenserver, {:match, value})
-  end
+    def match(value) do
+      GenServer.call(MyDb.DbGenserver, {:match, value})
+    end
 
-  def write_async(key, value) do
-    GenServer.cast(MyDb.DbGenserver, {:write, key, value})
-    :ok
-  end
+    def write_async(key, value) do
+      GenServer.cast(MyDb.DbGenserver, {:write, key, value})
+      :ok
+    end
 
-  def delete_async(key) do
-    GenServer.cast(MyDb.DbGenserver, {:delete, key})
-    :ok
+    def delete_async(key) do
+      GenServer.cast(MyDb.DbGenserver, {:delete, key})
+      :ok
+    end
   end
 
   ## GenServer callbacks ------------------------------------------------------
