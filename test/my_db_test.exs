@@ -1,5 +1,5 @@
 defmodule MyDbTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: false
   doctest MyDb
 
   setup do
@@ -8,7 +8,6 @@ defmodule MyDbTest do
     :ok = MyDb.write :b, 2
     :ok = MyDb.write :c, 3
     :ok = MyDb.write :d, 2
-    on_exit(fn -> :ok = MyDb.stop end)
   end
 
   test "read/1, write/2" do
