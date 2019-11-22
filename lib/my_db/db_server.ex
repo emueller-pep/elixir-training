@@ -12,63 +12,58 @@ defmodule MyDb.DbServer do
   MyDb.match(element) → [key1, ..., keyn]
   """
 
-  @backends %{
-    map_db: MyDb.Backends.MapDb,
-    tree_db: MyDb.Backends.TreeDb,
-    list_db: MyDb.Backends.ListDb,
-    ets_db: MyDb.Backends.EtsDb,
-    struct_db: MyDb.Backends.StructDb
-  }
+  defmodule Client do
+    @moduledoc "The methods used by the client to communicate with the server"
 
-  def start do
-    start(:map_db)
-  end
+    def start do
+      start(MyDb.Backends.MapDb)
+    end
 
-  def start(backend_name) do
-    {:ok, backend} = Map.fetch(@backends, backend_name)
-    pid = spawn(MyDb.DbServer, :init, [backend])
-    Process.register(pid, MyDb.DbServer)
-    :ok
-  end
+    def start(backend) do
+      pid = spawn(MyDb.DbServer, :init, [backend])
+      Process.register(pid, MyDb.DbServer)
+      :ok
+    end
 
-  def stop() do
-    send(MyDb.DbServer, {:destroy})
-    :ok
-  end
+    def stop() do
+      send(MyDb.DbServer, {:destroy})
+      :ok
+    end
 
-  def write(key, value) do
-    call({:write, key, value})
-  end
+    def write(key, value) do
+      call({:write, key, value})
+    end
 
-  def delete(key) do
-    call({:delete, key})
-  end
+    def delete(key) do
+      call({:delete, key})
+    end
 
-  def read(key) do
-    call({:read, key})
-  end
+    def read(key) do
+      call({:read, key})
+    end
 
-  def match(value) do
-    call({:match, value})
-  end
+    def match(value) do
+      call({:match, value})
+    end
 
-  def records() do
-    call({:records})
-  end
+    def records() do
+      call({:records})
+    end
 
-  def lock() do
-    call({:lock})
-  end
+    def lock() do
+      call({:lock})
+    end
 
-  def unlock() do
-    call({:unlock})
-  end
+    def unlock() do
+      call({:unlock})
+    end
 
-  defp call(message) do
-    send(MyDb.DbServer, {:request, self(), message})
+    defp call(message) do
+      send(MyDb.DbServer, {:request, self(), message})
 
-    receive do
-      {:reply, reply} -> reply
+      receive do
+        {:reply, reply} -> reply
+      end
     end
   end
 
