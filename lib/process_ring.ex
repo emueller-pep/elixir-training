@@ -12,23 +12,23 @@ defmodule ProcessRing do
 
   @doc "start up the processes and connect them together"
   def start(n) do
-    { :ok, pids } = RoutedRing.start(n, construct_routes(n))
+    {:ok, pids} = RoutedRing.start(n, construct_routes(n))
     Process.register(List.first(pids), :ringleader)
     :ok
   end
 
   def construct_routes(n) when n > 1 do
-    Enum.map((0..n-1), fn(i) -> { rem(i + n - 1, n), i, rem(i + 1, n) } end)
+    Enum.map(0..(n - 1), fn i -> {rem(i + n - 1, n), i, rem(i + 1, n)} end)
   end
 
   @doc "send this message for N hops around the ring"
   def pass_message(message, n) do
-    send(:ringleader, { :pass, nil, message, n - 1 })
+    send(:ringleader, {:pass, nil, message, n - 1})
     :ok
   end
 
   def stop_all do
-    send(:ringleader, { :stop })
+    send(:ringleader, {:stop})
     :ok
   end
 end

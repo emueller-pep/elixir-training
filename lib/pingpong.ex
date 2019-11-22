@@ -66,5 +66,4 @@ defmodule Pingpong do
         exit(:timeout)
     end
   end
-
 end

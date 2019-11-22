@@ -4,18 +4,20 @@ defmodule MyDb.Backends.MapDbTest do
   doctest MapDb
 
   test "MapDb.new/0" do
-    assert MapDb.new == %{}
+    assert MapDb.new() == %{}
   end
 
   test "MapDb.destroy/1" do
-    db = MapDb.new
+    db = MapDb.new()
     assert MapDb.destroy(db) == :ok
   end
 
   test "MapDb.write/3" do
-    db = MapDb.new
-         |> MapDb.write(:foo, :bar)
-         |> MapDb.write(:baz, 3)
+    db =
+      MapDb.new()
+      |> MapDb.write(:foo, :bar)
+      |> MapDb.write(:baz, 3)
+
     assert db == %{foo: :bar, baz: 3}
   end
 
@@ -36,10 +38,10 @@ defmodule MyDb.Backends.MapDbTest do
 
   test "MapDb.match/2" do
     db = %{foo: 1, bar: 2, baz: 3, bim: 2}
-    assert MapDb.match(db, 1) == { :ok, [:foo] }
-    assert MapDb.match(db, 3) == { :ok, [:baz] }
+    assert MapDb.match(db, 1) == {:ok, [:foo]}
+    assert MapDb.match(db, 3) == {:ok, [:baz]}
 
-    { :ok, matches } = MapDb.match(db, 2)
+    {:ok, matches} = MapDb.match(db, 2)
     assert Enum.sort(matches) == [:bar, :bim]
   end
 end

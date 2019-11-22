@@ -24,22 +24,25 @@ defmodule EchoServer do
 
   @doc "request that the supplied server halt its receive-loop"
   def stop do
-    send(:echo_server, { :stop })
+    send(:echo_server, {:stop})
     :ok
   end
 
   @doc "request that the supplied server print out a particular message"
-  def print(message) do 
-    send(:echo_server, { :print, message })
+  def print(message) do
+    send(:echo_server, {:print, message})
     :ok
   end
 
   @doc "receive-loop for the echo-server"
   def loop do
     receive do
-      { :print, message } -> IO.puts(message); loop()
-      { :stop } -> :ok
+      {:print, message} ->
+        IO.puts(message)
+        loop()
+
+      {:stop} ->
+        :ok
     end
   end
 end
-

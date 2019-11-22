@@ -10,10 +10,15 @@ defmodule Temp do
 
   @doc "Convert a celsius temperature to fahrenheit "
   def c2f(temperature_in_c) do
-    (temperature_in_c * 9 / 5) + 32
+    temperature_in_c * 9 / 5 + 32
   end
 
   @doc "Convert a temperature to another system"
-  def convert({:c, temperature_in_c}) do c2f(temperature_in_c) end
-  def convert({:f, temperature_in_f}) do f2c(temperature_in_f) end
+  def convert({:c, temperature_in_c}) do
+    c2f(temperature_in_c)
+  end
+
+  def convert({:f, temperature_in_f}) do
+    f2c(temperature_in_f)
+  end
 end

@@ -13,39 +13,62 @@ defmodule MyDb.DbServer do
   """
 
   @backends %{
-    map_db:     MyDb.Backends.MapDb,
-    tree_db:    MyDb.Backends.TreeDb,
-    list_db:    MyDb.Backends.ListDb,
-    ets_db:     MyDb.Backends.EtsDb,
-    struct_db:  MyDb.Backends.StructDb,
+    map_db: MyDb.Backends.MapDb,
+    tree_db: MyDb.Backends.TreeDb,
+    list_db: MyDb.Backends.ListDb,
+    ets_db: MyDb.Backends.EtsDb,
+    struct_db: MyDb.Backends.StructDb
   }
 
-  def start do start(:map_db) end
+  def start do
+    start(:map_db)
+  end
 
   def start(backend_name) do
-    { :ok, backend } = Map.fetch(@backends, backend_name)
+    {:ok, backend} = Map.fetch(@backends, backend_name)
     pid = spawn(MyDb.DbServer, :init, [backend])
     Process.register(pid, MyDb.DbServer)
     :ok
   end
 
   def stop() do
-    send(MyDb.DbServer, { :destroy })
+    send(MyDb.DbServer, {:destroy})
     :ok
   end
 
-  def write(key, value) do call({ :write, key, value }) end
-  def delete(key) do call({ :delete, key }) end
-  def read(key) do call({ :read, key }) end
-  def match(value) do call({ :match, value }) end
-  def records() do call({ :records }) end
-  def lock() do call({ :lock }) end
-  def unlock() do call({ :unlock }) end
+  def write(key, value) do
+    call({:write, key, value})
+  end
+
+  def delete(key) do
+    call({:delete, key})
+  end
+
+  def read(key) do
+    call({:read, key})
+  end
+
+  def match(value) do
+    call({:match, value})
+  end
+
+  def records() do
+    call({:records})
+  end
+
+  def lock() do
+    call({:lock})
+  end
+
+  def unlock() do
+    call({:unlock})
+  end
 
   defp call(message) do
-    send(MyDb.DbServer, { :request, self(), message })
+    send(MyDb.DbServer, {:request, self(), message})
+
     receive do
-      { :reply, reply } -> reply
+      {:reply, reply} -> reply
     end
   end
 
@@ -56,11 +79,15 @@ defmodule MyDb.DbServer do
 
   defp unlocked_loop(backend, db) do
     receive do
-      { :destroy } -> backend.destroy(db); :ok
-      { :request, from, { :lock } } -> 
-        send(from, { :reply, :ok })
+      {:destroy} ->
+        backend.destroy(db)
+        :ok
+
+      {:request, from, {:lock}} ->
+        send(from, {:reply, :ok})
         locked_loop(backend, db, from)
-      { :request, from, message } ->
+
+      {:request, from, message} ->
         db = handle_request(backend, db, from, message)
         unlocked_loop(backend, db)
     end
@@ -68,10 +95,11 @@ defmodule MyDb.DbServer do
 
   defp locked_loop(backend, db, from) do
     receive do
-      { :request, ^from, { :unlock } } ->
-        send(from, { :reply, :ok })
+      {:request, ^from, {:unlock}} ->
+        send(from, {:reply, :ok})
         unlocked_loop(backend, db)
-      { :request, ^from, message } ->
+
+      {:request, ^from, message} ->
         db = handle_request(backend, db, from, message)
         locked_loop(backend, db, from)
     end
@@ -79,25 +107,29 @@ defmodule MyDb.DbServer do
 
   defp handle_request(backend, db, from, message) do
     case message do
-      { :write, key, value } ->
+      {:write, key, value} ->
         db = backend.write(db, key, value)
-        send(from, { :reply, :ok })
+        send(from, {:reply, :ok})
         db
-      { :read, key } ->
+
+      {:read, key} ->
         result = backend.read(db, key)
-        send(from, { :reply, result })
+        send(from, {:reply, result})
         db
-      { :delete, key } ->
+
+      {:delete, key} ->
         db = backend.delete(db, key)
-        send(from, { :reply, :ok })
+        send(from, {:reply, :ok})
         db
-      { :match, value } ->
+
+      {:match, value} ->
         results = backend.match(db, value)
-        send(from, { :reply, results })
+        send(from, {:reply, results})
         db
-      { :records } ->
+
+      {:records} ->
         results = backend.records(db)
-        send(from, { :reply, results })
+        send(from, {:reply, results})
         db
     end
   end

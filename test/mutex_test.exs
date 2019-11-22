@@ -12,31 +12,37 @@ defmodule MutexTest do
   def loop(mutex_name, owner) do
     receive do
       :stop ->
-        send(owner, { self(), :stopped })
+        send(owner, {self(), :stopped})
         :ok
+
       :take ->
         Mutex.wait(mutex_name)
-        send(owner, { self(), :taken })
+        send(owner, {self(), :taken})
         loop(mutex_name, owner)
+
       :release ->
         Mutex.signal(mutex_name)
-        send(owner, { self(), :released })
+        send(owner, {self(), :released})
         loop(mutex_name, owner)
+
       :ping ->
-        send(owner, { self(), :pong })
+        send(owner, {self(), :pong})
         loop(mutex_name, owner)
+
       :die ->
         Process.exit(self(), :intentional)
+
       _ ->
-        send(owner, { self(), :error })
+        send(owner, {self(), :error})
         loop(mutex_name, owner)
     end
   end
 
   def call(pid, command, timeout) do
     send(pid, command)
+
     receive do
-      { ^pid, response } -> response
+      {^pid, response} -> response
     after
       timeout -> :timeout
     end

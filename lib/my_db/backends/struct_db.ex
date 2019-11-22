@@ -12,33 +12,50 @@ defmodule MyDb.Backends.StructDb do
   end
 
   @doc "create a new database"
-  def new do [] end
-  def new([]) do new() end
-  def new(pairs) do Enum.reduce([new() | pairs], fn({k,v}, db) -> [%Record{key: k, value: v} | db] end) end
+  def new do
+    []
+  end
+
+  def new([]) do
+    new()
+  end
+
+  def new(pairs) do
+    Enum.reduce([new() | pairs], fn {k, v}, db -> [%Record{key: k, value: v} | db] end)
+  end
 
   @doc "clean up an existing database"
-  def destroy(_db) do :ok end
+  def destroy(_db) do
+    :ok
+  end
 
   @doc "write a new record onto the database"
-  def write(db, key, value) do [%Record{key: key, value: value} | db] end
+  def write(db, key, value) do
+    [%Record{key: key, value: value} | db]
+  end
 
   @doc "delete a record from the database"
-  def delete(db, key) do Enum.filter(db, fn %Record{key: k} -> k != key end) end
+  def delete(db, key) do
+    Enum.filter(db, fn %Record{key: k} -> k != key end)
+  end
 
   @doc "read the value for a record from the database"
   def read(db, key) do
     match = Enum.find(db, fn %Record{key: k} -> k == key end)
+
     if match == nil do
-      { :error, :instance }
+      {:error, :instance}
     else
-      { :ok, match.value }
+      {:ok, match.value}
     end
   end
 
   @doc "find all keys having the supplied value in the database"
   def match(db, value) do
-    results = Enum.filter(db, fn %Record{value: v} -> v == value end)
-              |> Enum.map(fn record -> record.key end)
-    { :ok, results }
+    results =
+      Enum.filter(db, fn %Record{value: v} -> v == value end)
+      |> Enum.map(fn record -> record.key end)
+
+    {:ok, results}
   end
 end

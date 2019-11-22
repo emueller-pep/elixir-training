@@ -15,7 +15,7 @@ defmodule MyDb.Backends.EtsDb do
 
   @doc "create a new database and initialize it with data"
   def new(pairs) do
-    Enum.reduce(pairs, new(), fn({k,v}, db) -> write(db, k, v) end)
+    Enum.reduce(pairs, new(), fn {k, v}, db -> write(db, k, v) end)
   end
 
   @doc "clean up an existing database"
@@ -24,21 +24,27 @@ defmodule MyDb.Backends.EtsDb do
     :ok
   end
 
-  defp encode(x) do :erlang.term_to_binary(x) end
-  defp decode(x) do :erlang.binary_to_term(x) end
+  defp encode(x) do
+    :erlang.term_to_binary(x)
+  end
+
+  defp decode(x) do
+    :erlang.binary_to_term(x)
+  end
 
   @doc "write a key and value into the database"
   def write(db, key, value) do
-    :ets.insert(db.table_id, { encode(key), encode(value) })
+    :ets.insert(db.table_id, {encode(key), encode(value)})
     db
   end
 
   @doc "read a key and value from the database"
   def read(db, key) do
     results = :ets.lookup(db.table_id, encode(key))
+
     case results do
-      [] -> { :error, :instance }
-      [{ _bkey, bvalue } | _rest] -> { :ok, decode(bvalue) }
+      [] -> {:error, :instance}
+      [{_bkey, bvalue} | _rest] -> {:ok, decode(bvalue)}
     end
   end
 
@@ -50,14 +56,16 @@ defmodule MyDb.Backends.EtsDb do
 
   @doc "find all keys matching the given value"
   def match(db, value) do
-    results = :ets.match(db.table_id, {:"$1", encode(value) })
-              |> Enum.map(fn([bk]) -> decode(bk) end)
-    { :ok, results }
+    results =
+      :ets.match(db.table_id, {:"$1", encode(value)})
+      |> Enum.map(fn [bk] -> decode(bk) end)
+
+    {:ok, results}
   end
 
   @doc "dump every record as a kv-tuple"
   def records(db) do
     :ets.match(db.table_id, {:"$1", :"$2"})
-    |> Enum.map(fn([bk, bv]) -> { decode(bk), decode(bv) } end)
+    |> Enum.map(fn [bk, bv] -> {decode(bk), decode(bv)} end)
   end
 end

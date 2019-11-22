@@ -58,20 +58,23 @@ defmodule Fussball do
 
       :kick ->
         :timer.sleep(500)
+
         case :random.uniform(1000) do
           n when n > 950 ->
             IO.puts("#{mycountry} SAVES! And what a save!!")
             send(othercountry, :save)
             send(othercountry, :kick)
+
           n when n > 800 ->
-              IO.puts("#{mycountry} SCORES!!")
-              send(othercountry, :score)
+            IO.puts("#{mycountry} SCORES!!")
+            send(othercountry, :score)
+
           _ ->
             IO.puts("#{mycountry} kicks the ball...")
             send(othercountry, :kick)
         end
+
         loop(mycountry, othercountry)
     end
   end
-
 end

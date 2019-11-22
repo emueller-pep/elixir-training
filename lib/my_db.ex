@@ -15,20 +15,33 @@ defmodule MyDb do
 
   @doc "Start the database server"
   def start(%{backend: backend}) do Server.start(backend) end
-  def start do Server.start end
+
+  def start do
+    Server.start()
+  end
 
   @doc "Stop the database server"
-  def stop do Server.stop end
+  def stop do
+    Server.stop()
+  end
 
   @doc "Write a key-value pair into the database"
-  def write(key, value) do Server.write(key, value) end
+  def write(key, value) do
+    Server.write(key, value)
+  end
 
   @doc "Delete a key-value pair from the database (given the key)"
-  def delete(key) do Server.delete(key) end
+  def delete(key) do
+    Server.delete(key)
+  end
 
   @doc "Read the value from the database for a given key"
-  def read(key) do Server.read(key) end
+  def read(key) do
+    Server.read(key)
+  end
 
   @doc "Find all keys that have a specified value in the database"
-  def match(value) do Server.match(value) end
+  def match(value) do
+    Server.match(value)
+  end
 end

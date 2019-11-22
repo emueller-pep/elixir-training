@@ -7,24 +7,37 @@ defmodule MyDb.DbGenserver do
 
   ## Client API ---------------------------------------------------------------
 
-  def start do start(MyDb.Backends.MapDb) end
+  def start do
+    start(MyDb.Backends.MapDb)
+  end
 
   def start(backend) do
-    { :ok, _pid } = GenServer.start_link(MyDb.DbGenserver, backend, [name: MyDb.DbGenserver])
+    {:ok, _pid} = GenServer.start_link(MyDb.DbGenserver, backend, name: MyDb.DbGenserver)
     :ok
   end
 
   def stop do
     pid = Process.whereis(MyDb.DbGenserver)
-    IO.puts "trying to stop #{inspect({MyDb.DbGenserver, :normal, 1_000})} (#{inspect pid})"
+    IO.puts("trying to stop #{inspect({MyDb.DbGenserver, :normal, 1_000})} (#{inspect(pid)})")
     :ok = GenServer.stop(MyDb.DbGenserver, :normal, 1_000)
     :ok
   end
 
-  def write(key, value) do GenServer.call(MyDb.DbGenserver, {:write, key, value}) end
-  def delete(key) do GenServer.call(MyDb.DbGenserver, {:delete, key}) end
-  def read(key) do GenServer.call(MyDb.DbGenserver, {:read, key}) end
-  def match(value) do GenServer.call(MyDb.DbGenserver, {:match, value}) end
+  def write(key, value) do
+    GenServer.call(MyDb.DbGenserver, {:write, key, value})
+  end
+
+  def delete(key) do
+    GenServer.call(MyDb.DbGenserver, {:delete, key})
+  end
+
+  def read(key) do
+    GenServer.call(MyDb.DbGenserver, {:read, key})
+  end
+
+  def match(value) do
+    GenServer.call(MyDb.DbGenserver, {:match, value})
+  end
 
   def write_async(key, value) do
     GenServer.cast(MyDb.DbGenserver, {:write, key, value})
@@ -37,10 +50,10 @@ defmodule MyDb.DbGenserver do
   end
 
   ## GenServer callbacks ------------------------------------------------------
-  
+
   @impl true
   def init(backend) do
-    { :ok, %{db: backend.new, backend: backend} }
+    {:ok, %{db: backend.new, backend: backend}}
   end
 
   @impl true
@@ -49,7 +62,7 @@ defmodule MyDb.DbGenserver do
   end
 
   ## Message handlers
- 
+
   @impl true
   def handle_cast({:write, key, value}, %{db: db, backend: backend}) do
     {:noreply, %{db: backend.write(db, key, value), backend: backend}}
@@ -71,7 +84,7 @@ defmodule MyDb.DbGenserver do
   end
 
   @impl true
-  def handle_call({:read, key}, _from, %{db: db, backend: backend }) do
+  def handle_call({:read, key}, _from, %{db: db, backend: backend}) do
     {:reply, backend.read(db, key), %{db: db, backend: backend}}
   end
 

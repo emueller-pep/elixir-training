@@ -4,18 +4,20 @@ defmodule MyDb.Backends.ListDbTest do
   doctest ListDb
 
   test "new/0" do
-    assert ListDb.new == []
+    assert ListDb.new() == []
   end
 
   test "destroy/1" do
-    db = ListDb.new
+    db = ListDb.new()
     assert ListDb.destroy(db) == :ok
   end
 
   test "write/3" do
-    db = ListDb.new
-         |> ListDb.write(:foo, :bar)
-         |> ListDb.write(:baz, 3)
+    db =
+      ListDb.new()
+      |> ListDb.write(:foo, :bar)
+      |> ListDb.write(:baz, 3)
+
     assert db == [baz: 3, foo: :bar]
   end
 
@@ -36,8 +38,8 @@ defmodule MyDb.Backends.ListDbTest do
 
   test "match/2" do
     db = [foo: 1, bar: 2, baz: 3, bar: 7, bim: 2]
-    assert ListDb.match(db, 1) == { :ok, [:foo] }
-    assert ListDb.match(db, 3) == { :ok, [:baz] }
-    assert ListDb.match(db, 2) == { :ok, [:bar, :bim] }
+    assert ListDb.match(db, 1) == {:ok, [:foo]}
+    assert ListDb.match(db, 3) == {:ok, [:baz]}
+    assert ListDb.match(db, 2) == {:ok, [:bar, :bim]}
   end
 end

@@ -8,29 +8,39 @@ defmodule MyDb.Backends.MapDb do
   """
 
   @doc "create a new database"
-  def new do %{} end
+  def new do
+    %{}
+  end
 
   @doc "clean up an existing database"
-  def destroy(_db) do :ok end
+  def destroy(_db) do
+    :ok
+  end
 
   @doc "write a new record onto the database"
-  def write(db, key, value) do Map.put(db, key, value) end
+  def write(db, key, value) do
+    Map.put(db, key, value)
+  end
 
   @doc "delete a record from the database"
-  def delete(db, key) do Map.delete(db, key) end
+  def delete(db, key) do
+    Map.delete(db, key)
+  end
 
   @doc "read the value for a record from the database"
   def read(db, key) do
     case db do
-      %{^key => value} -> { :ok, value }
-      _ -> { :error, :instance }
+      %{^key => value} -> {:ok, value}
+      _ -> {:error, :instance}
     end
   end
 
   @doc "find all keys having the supplied value in the database"
   def match(db, value) do
-    results = Enum.filter(db, fn({_k,v}) -> v == value end)
-              |> Enum.map(fn({k,_v}) -> k end)
-    { :ok, results }
+    results =
+      Enum.filter(db, fn {_k, v} -> v == value end)
+      |> Enum.map(fn {k, _v} -> k end)
+
+    {:ok, results}
   end
 end

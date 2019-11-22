@@ -18,7 +18,7 @@ defmodule HigherOrderTest do
     assert HigherOrder.select_evens_to(1) == []
     assert HigherOrder.select_evens_to(8) == [2, 4, 6, 8]
     assert HigherOrder.select_evens_to(5) == [2, 4]
-    catch_error HigherOrder.select_evens_to(-1)
+    catch_error(HigherOrder.select_evens_to(-1))
   end
 
   test "concatenate/1" do
