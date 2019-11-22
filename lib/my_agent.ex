@@ -14,7 +14,7 @@ defmodule MyAgent do
   end
 
   def update(agent, updater) do
-    GenServer.call(agent, {:update, updater})
+    GenServer.cast(agent, {:update, updater})
   end
 
   def get(agent, transformer) do
@@ -33,8 +33,8 @@ defmodule MyAgent do
   ## Message Handlers
 
   @impl true
-  def handle_call({:update, updater}, _from, value) do
-    {:reply, :ok, updater.(value)}
+  def handle_cast({:update, updater}, value) do
+    {:reply, updater.(value)}
   end
 
   @impl true
