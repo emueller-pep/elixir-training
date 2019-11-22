@@ -24,6 +24,14 @@ defmodule MyDb.DbGenserver do
       :ok
     end
 
+    def lock do
+      GenServer.call(MyDb.DbGenserver, {:lock, self()})
+    end
+
+    def unlock do
+      GenServer.call(MyDb.DbGenserver, {:unlock, self()})
+    end
+
     def write(key, value) do
       GenServer.call(MyDb.DbGenserver, {:write, key, value})
     end
@@ -55,7 +63,7 @@ defmodule MyDb.DbGenserver do
 
   @impl true
   def init(backend) do
-    {:ok, %{db: backend.new, backend: backend}}
+    {:ok, %{db: backend.new, backend: backend, locked_by: nil}}
   end
 
   @impl true
@@ -77,6 +85,24 @@ defmodule MyDb.DbGenserver do
     %{db: db, backend: backend} = state
     newdb = backend.delete(db, key)
     {:noreply, %{state | db: newdb}}
+  end
+
+  @impl true
+  def handle_call({:lock, pid}, _from, state) do
+    case state do
+      %{locked_by: nil} -> {:reply, :ok, %{state | locked_by: pid}}
+      %{locked_by: ^pid} -> {:reply, :ok, state}
+      %{} -> {:reply, :error, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:unlock, pid}, _from, state) do
+    case state do
+      %{locked_by: nil} -> {:reply, :ok, state}
+      %{locked_by: ^pid} -> {:reply, :ok, %{state | locked_by: nil}}
+      _ -> {:reply, :error, state}
+    end
   end
 
   @impl true

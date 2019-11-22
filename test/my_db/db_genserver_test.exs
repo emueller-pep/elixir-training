@@ -48,4 +48,58 @@ defmodule MyDb.DbGenserverTest do
       assert Enum.sort(matches) == [:a, :c]
     end
   end
+
+  describe "lock/0" do
+    setup do: Client.start(MapDb)
+
+    test "lock when not locked yet" do
+      assert :sys.get_state(MyDb.DbGenserver)[:locked_by] == nil
+      assert Client.lock == :ok
+      assert :sys.get_state(MyDb.DbGenserver)[:locked_by] == self()
+    end
+
+    test "lock when already locked by me" do
+      # fake myself having already locked it
+      assert GenServer.call(MyDb.DbGenserver, {:lock, self()})
+
+      assert :sys.get_state(MyDb.DbGenserver)[:locked_by] == self() 
+      assert Client.lock == :ok
+      assert :sys.get_state(MyDb.DbGenserver)[:locked_by] == self()
+    end
+
+    test "lock when already locked by someone else" do
+      # fake someone else having already locked it
+      GenServer.call(MyDb.DbGenserver, {:lock, :someone_else})
+
+      assert Client.lock == :error
+      assert :sys.get_state(MyDb.DbGenserver)[:locked_by] == :someone_else
+    end
+  end
+
+  describe "unlock/0" do
+    setup do: Client.start(MapDb)
+
+    test "when not locked" do
+      assert :sys.get_state(MyDb.DbGenserver)[:locked_by] == nil
+      assert Client.unlock == :ok
+      assert :sys.get_state(MyDb.DbGenserver)[:locked_by] == nil
+    end
+
+    test "when locked by me" do
+      Client.lock
+
+      assert :sys.get_state(MyDb.DbGenserver)[:locked_by] == self()
+      assert Client.unlock == :ok
+      assert :sys.get_state(MyDb.DbGenserver)[:locked_by] == nil
+    end
+
+    test "when locked by someone else" do
+      # fake someone else having already locked it
+      GenServer.call(MyDb.DbGenserver, {:lock, :someone_else})
+
+      assert :sys.get_state(MyDb.DbGenserver)[:locked_by] == :someone_else
+      assert Client.unlock == :error
+      assert :sys.get_state(MyDb.DbGenserver)[:locked_by] == :someone_else
+    end
+  end
 end
