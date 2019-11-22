@@ -66,37 +66,51 @@ defmodule MyDb.DbGenserver do
   ## Message handlers
 
   @impl true
-  def handle_cast({:write, key, value}, %{db: db, backend: backend}) do
-    {:noreply, %{db: backend.write(db, key, value), backend: backend}}
+  def handle_cast({:write, key, value}, state) do
+    %{db: db, backend: backend} = state
+    newdb = backend.write(db, key, value)
+    {:noreply, %{state | db: newdb}}
   end
 
   @impl true
-  def handle_cast({:delete, key}, %{db: db, backend: backend}) do
-    {:noreply, %{db: backend.delete(db, key), backend: backend}}
+  def handle_cast({:delete, key}, state) do
+    %{db: db, backend: backend} = state
+    newdb = backend.delete(db, key)
+    {:noreply, %{state | db: newdb}}
   end
 
   @impl true
-  def handle_call({:write, key, value}, _from, %{db: db, backend: backend}) do
-    {:reply, :ok, %{db: backend.write(db, key, value), backend: backend}}
+  def handle_call({:write, key, value}, _from, state) do
+    %{db: db, backend: backend} = state
+    newdb = backend.write(db, key, value)
+    {:reply, :ok, %{state | db: newdb}}
   end
 
   @impl true
-  def handle_call({:delete, key}, _from, %{db: db, backend: backend}) do
-    {:reply, :ok, %{db: backend.delete(db, key), backend: backend}}
+  def handle_call({:delete, key}, _from, state) do
+    %{db: db, backend: backend} = state
+    newdb = backend.delete(db, key)
+    {:reply, :ok, %{state | db: newdb}}
   end
 
   @impl true
-  def handle_call({:read, key}, _from, %{db: db, backend: backend}) do
-    {:reply, backend.read(db, key), %{db: db, backend: backend}}
+  def handle_call({:read, key}, _from, state) do
+    %{db: db, backend: backend} = state
+    result = backend.read(db, key)
+    {:reply, result, state}
   end
 
   @impl true
-  def handle_call({:match, value}, _from, %{db: db, backend: backend}) do
-    {:reply, backend.match(db, value), %{db: db, backend: backend}}
+  def handle_call({:match, value}, _from, state) do
+    %{db: db, backend: backend} = state
+    result = backend.match(db, value)
+    {:reply, result, state}
   end
 
   @impl true
-  def handle_call({:records}, _from, %{db: db, backend: backend}) do
-    {:reply, backend.records(db), %{db: db, backend: backend}}
+  def handle_call({:records}, _from, state) do
+    %{db: db, backend: backend} = state
+    result = backend.records(db)
+    {:reply, result, state}
   end
 end
