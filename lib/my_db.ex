@@ -14,7 +14,9 @@ defmodule MyDb do
   alias MyDb.DbGenserver, as: Server
 
   @doc "Start the database server"
-  def start(%{backend: backend}) do Server.start(backend) end
+  def start(%{backend: backend}) do
+    Server.start(backend)
+  end
 
   def start do
     Server.start()
