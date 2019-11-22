@@ -8,6 +8,7 @@ defmodule MyDb.Backends.StructDb do
   """
 
   defmodule Record do
+    @moduledoc "Struct for the individual records"
     defstruct [:key, :value]
   end
 

@@ -4,6 +4,7 @@ defmodule MyDb.Backends.EtsDb do
   """
 
   defmodule Table do
+    @moduledoc "Struct representing the database"
     defstruct [:table_id, :name]
   end
 
