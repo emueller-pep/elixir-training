@@ -1,138 +1,138 @@
 defmodule MyDb.DbServerTest do
-  alias MyDb.DbServer, as: Server
+  alias MyDb.DbServer.Client, as: Client
   use ExUnit.Case, async: false
   doctest MyDb.DbServer
 
   test "write/2" do
-    :ok = Server.start()
-    assert Server.read(:foo) == {:error, :instance}
-    assert Server.write(:foo, 5)
-    assert Server.read(:foo) == {:ok, 5}
-    :ok = Server.stop()
+    :ok = Client.start()
+    assert Client.read(:foo) == {:error, :instance}
+    assert Client.write(:foo, 5)
+    assert Client.read(:foo) == {:ok, 5}
+    :ok = Client.stop()
   end
 
   test "delete/1" do
-    :ok = Server.start()
-    Server.write(:foo, 5)
-    Server.write(:bar, 6)
+    :ok = Client.start()
+    Client.write(:foo, 5)
+    Client.write(:bar, 6)
 
-    assert Server.delete(:foo) == :ok
-    assert Server.read(:foo) == {:error, :instance}
-    assert Server.read(:bar) == {:ok, 6}
-    :ok = Server.stop()
+    assert Client.delete(:foo) == :ok
+    assert Client.read(:foo) == {:error, :instance}
+    assert Client.read(:bar) == {:ok, 6}
+    :ok = Client.stop()
   end
 
   test "read/1" do
-    :ok = Server.start()
-    Server.write(:foo, 5)
-    Server.write(:bar, 6)
+    :ok = Client.start()
+    Client.write(:foo, 5)
+    Client.write(:bar, 6)
 
-    assert Server.read(:foo) == {:ok, 5}
-    assert Server.read(:baz) == {:error, :instance}
-    :ok = Server.stop()
+    assert Client.read(:foo) == {:ok, 5}
+    assert Client.read(:baz) == {:error, :instance}
+    :ok = Client.stop()
   end
 
   test "match/1" do
-    :ok = Server.start()
-    Server.write(:foo, 5)
-    Server.write(:bar, 6)
-    Server.write(:bam, 5)
+    :ok = Client.start()
+    Client.write(:foo, 5)
+    Client.write(:bar, 6)
+    Client.write(:bam, 5)
 
-    {:ok, matches} = Server.match(5)
+    {:ok, matches} = Client.match(5)
     assert Enum.sort(matches) == [:bam, :foo]
-    assert Server.match(6) == {:ok, [:bar]}
-    :ok = Server.stop()
+    assert Client.match(6) == {:ok, [:bar]}
+    :ok = Client.stop()
   end
 
   describe "through the backends" do
     test ":list_db" do
-      :ok = Server.start(:list_db)
-      assert Server.write(:a, 1) == :ok
-      assert Server.write(:b, 2) == :ok
-      assert Server.write(:c, 1) == :ok
+      :ok = Client.start(MyDb.Backends.ListDb)
+      assert Client.write(:a, 1) == :ok
+      assert Client.write(:b, 2) == :ok
+      assert Client.write(:c, 1) == :ok
 
-      assert Server.read(:a) == {:ok, 1}
-      assert Server.read(:z) == {:error, :instance}
+      assert Client.read(:a) == {:ok, 1}
+      assert Client.read(:z) == {:error, :instance}
 
-      {:ok, matches} = Server.match(1)
+      {:ok, matches} = Client.match(1)
       assert Enum.sort(matches) == [:a, :c]
 
-      assert Server.delete(:a) == :ok
-      assert Server.read(:a) == {:error, :instance}
+      assert Client.delete(:a) == :ok
+      assert Client.read(:a) == {:error, :instance}
 
-      assert Server.stop() == :ok
+      assert Client.stop() == :ok
     end
 
     test ":map_db" do
-      :ok = Server.start(:map_db)
-      assert Server.write(:a, 1) == :ok
-      assert Server.write(:b, 2) == :ok
-      assert Server.write(:c, 1) == :ok
+      :ok = Client.start(MyDb.Backends.MapDb)
+      assert Client.write(:a, 1) == :ok
+      assert Client.write(:b, 2) == :ok
+      assert Client.write(:c, 1) == :ok
 
-      assert Server.read(:a) == {:ok, 1}
-      assert Server.read(:z) == {:error, :instance}
+      assert Client.read(:a) == {:ok, 1}
+      assert Client.read(:z) == {:error, :instance}
 
-      {:ok, matches} = Server.match(1)
+      {:ok, matches} = Client.match(1)
       assert Enum.sort(matches) == [:a, :c]
 
-      assert Server.delete(:a) == :ok
-      assert Server.read(:a) == {:error, :instance}
+      assert Client.delete(:a) == :ok
+      assert Client.read(:a) == {:error, :instance}
 
-      assert Server.stop() == :ok
+      assert Client.stop() == :ok
     end
 
     test ":tree_db" do
-      :ok = Server.start(:tree_db)
-      assert Server.write(:a, 1) == :ok
-      assert Server.write(:b, 2) == :ok
-      assert Server.write(:c, 1) == :ok
+      :ok = Client.start(MyDb.Backends.TreeDb)
+      assert Client.write(:a, 1) == :ok
+      assert Client.write(:b, 2) == :ok
+      assert Client.write(:c, 1) == :ok
 
-      assert Server.read(:a) == {:ok, 1}
-      assert Server.read(:z) == {:error, :instance}
+      assert Client.read(:a) == {:ok, 1}
+      assert Client.read(:z) == {:error, :instance}
 
-      {:ok, matches} = Server.match(1)
+      {:ok, matches} = Client.match(1)
       assert Enum.sort(matches) == [:a, :c]
 
-      assert Server.delete(:a) == :ok
-      assert Server.read(:a) == {:error, :instance}
+      assert Client.delete(:a) == :ok
+      assert Client.read(:a) == {:error, :instance}
 
-      assert Server.stop() == :ok
+      assert Client.stop() == :ok
     end
 
     test ":struct_db" do
-      :ok = Server.start(:struct_db)
-      assert Server.write(:a, 1) == :ok
-      assert Server.write(:b, 2) == :ok
-      assert Server.write(:c, 1) == :ok
+      :ok = Client.start(MyDb.Backends.StructDb)
+      assert Client.write(:a, 1) == :ok
+      assert Client.write(:b, 2) == :ok
+      assert Client.write(:c, 1) == :ok
 
-      assert Server.read(:a) == {:ok, 1}
-      assert Server.read(:z) == {:error, :instance}
+      assert Client.read(:a) == {:ok, 1}
+      assert Client.read(:z) == {:error, :instance}
 
-      {:ok, matches} = Server.match(1)
+      {:ok, matches} = Client.match(1)
       assert Enum.sort(matches) == [:a, :c]
 
-      assert Server.delete(:a) == :ok
-      assert Server.read(:a) == {:error, :instance}
+      assert Client.delete(:a) == :ok
+      assert Client.read(:a) == {:error, :instance}
 
-      assert Server.stop() == :ok
+      assert Client.stop() == :ok
     end
 
     test ":ets_db" do
-      :ok = Server.start(:ets_db)
-      assert Server.write(:a, 1) == :ok
-      assert Server.write(:b, 2) == :ok
-      assert Server.write(:c, 1) == :ok
+      :ok = Client.start(MyDb.Backends.EtsDb)
+      assert Client.write(:a, 1) == :ok
+      assert Client.write(:b, 2) == :ok
+      assert Client.write(:c, 1) == :ok
 
-      assert Server.read(:a) == {:ok, 1}
-      assert Server.read(:z) == {:error, :instance}
+      assert Client.read(:a) == {:ok, 1}
+      assert Client.read(:z) == {:error, :instance}
 
-      {:ok, matches} = Server.match(1)
+      {:ok, matches} = Client.match(1)
       assert Enum.sort(matches) == [:a, :c]
 
-      assert Server.delete(:a) == :ok
-      assert Server.read(:a) == {:error, :instance}
+      assert Client.delete(:a) == :ok
+      assert Client.read(:a) == {:error, :instance}
 
-      assert Server.stop() == :ok
+      assert Client.stop() == :ok
     end
   end
 end
