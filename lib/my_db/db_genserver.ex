@@ -33,28 +33,28 @@ defmodule MyDb.DbGenserver do
     end
 
     def write(key, value) do
-      GenServer.call(MyDb.DbGenserver, {:write, key, value})
+      GenServer.call(MyDb.DbGenserver, {:write, self(), key, value})
     end
 
     def delete(key) do
-      GenServer.call(MyDb.DbGenserver, {:delete, key})
+      GenServer.call(MyDb.DbGenserver, {:delete, self(), key})
     end
 
     def read(key) do
-      GenServer.call(MyDb.DbGenserver, {:read, key})
+      GenServer.call(MyDb.DbGenserver, {:read, self(), key})
     end
 
     def match(value) do
-      GenServer.call(MyDb.DbGenserver, {:match, value})
+      GenServer.call(MyDb.DbGenserver, {:match, self(), value})
     end
 
     def write_async(key, value) do
-      GenServer.cast(MyDb.DbGenserver, {:write, key, value})
+      GenServer.cast(MyDb.DbGenserver, {:write, self(), key, value})
       :ok
     end
 
     def delete_async(key) do
-      GenServer.cast(MyDb.DbGenserver, {:delete, key})
+      GenServer.cast(MyDb.DbGenserver, {:delete, self(), key})
       :ok
     end
   end
@@ -73,70 +73,100 @@ defmodule MyDb.DbGenserver do
 
   ## Message handlers
 
-  @impl true
-  def handle_cast({:write, key, value}, state) do
-    %{db: db, backend: backend} = state
-    newdb = backend.write(db, key, value)
-    {:noreply, %{state | db: newdb}}
-  end
+  defp accessible?(state, pid), do: Enum.member?([nil, pid], state[:locked_by])
 
   @impl true
-  def handle_cast({:delete, key}, state) do
-    %{db: db, backend: backend} = state
-    newdb = backend.delete(db, key)
-    {:noreply, %{state | db: newdb}}
-  end
-
-  @impl true
-  def handle_call({:lock, pid}, _from, state) do
-    case state do
-      %{locked_by: nil} -> {:reply, :ok, %{state | locked_by: pid}}
-      %{locked_by: ^pid} -> {:reply, :ok, state}
-      %{} -> {:reply, :error, state}
+  def handle_cast({:write, caster, key, value}, state) do
+    if accessible?(state, caster) do
+      %{db: db, backend: backend} = state
+      newdb = backend.write(db, key, value)
+      {:noreply, %{state | db: newdb}}
+    else
+      {:noreply, state}
     end
   end
 
   @impl true
-  def handle_call({:unlock, pid}, _from, state) do
-    case state do
-      %{locked_by: nil} -> {:reply, :ok, state}
-      %{locked_by: ^pid} -> {:reply, :ok, %{state | locked_by: nil}}
-      _ -> {:reply, :error, state}
+  def handle_cast({:delete, caster, key}, state) do
+    if accessible?(state, caster) do
+      %{db: db, backend: backend} = state
+      newdb = backend.delete(db, key)
+      {:noreply, %{state | db: newdb}}
+    else
+      {:noreply, state}
     end
   end
 
   @impl true
-  def handle_call({:write, key, value}, _from, state) do
-    %{db: db, backend: backend} = state
-    newdb = backend.write(db, key, value)
-    {:reply, :ok, %{state | db: newdb}}
+  def handle_call({:lock, caller}, _from, state) do
+    if accessible?(state, caller) do
+      {:reply, :ok, %{state | locked_by: caller}}
+    else
+      {:reply, :error, state}
+    end
   end
 
   @impl true
-  def handle_call({:delete, key}, _from, state) do
-    %{db: db, backend: backend} = state
-    newdb = backend.delete(db, key)
-    {:reply, :ok, %{state | db: newdb}}
+  def handle_call({:unlock, caller}, _from, state) do
+    if accessible?(state, caller) do
+      {:reply, :ok, %{state | locked_by: nil}}
+    else
+      {:reply, :error, state}
+    end
   end
 
   @impl true
-  def handle_call({:read, key}, _from, state) do
-    %{db: db, backend: backend} = state
-    result = backend.read(db, key)
-    {:reply, result, state}
+  def handle_call({:write, caller, key, value}, _from, state) do
+    if accessible?(state, caller) do
+      %{db: db, backend: backend} = state
+      newdb = backend.write(db, key, value)
+      {:reply, :ok, %{state | db: newdb}}
+    else
+      {:reply, :error, state}
+    end
   end
 
   @impl true
-  def handle_call({:match, value}, _from, state) do
-    %{db: db, backend: backend} = state
-    result = backend.match(db, value)
-    {:reply, result, state}
+  def handle_call({:delete, caller, key}, _from, state) do
+    if accessible?(state, caller) do
+      %{db: db, backend: backend} = state
+      newdb = backend.delete(db, key)
+      {:reply, :ok, %{state | db: newdb}}
+    else
+      {:reply, :error, state}
+    end
   end
 
   @impl true
-  def handle_call({:records}, _from, state) do
-    %{db: db, backend: backend} = state
-    result = backend.records(db)
-    {:reply, result, state}
+  def handle_call({:read, caller, key}, _from, state) do
+    if accessible?(state, caller) do
+      %{db: db, backend: backend} = state
+      result = backend.read(db, key)
+      {:reply, result, state}
+    else
+      {:reply, {:error, :locked}, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:match, caller, value}, _from, state) do
+    if accessible?(state, caller) do
+      %{db: db, backend: backend} = state
+      result = backend.match(db, value)
+      {:reply, result, state}
+    else
+      {:reply, {:error, :locked}, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:records, caller}, _from, state) do
+    if accessible?(state, caller) do
+      %{db: db, backend: backend} = state
+      result = backend.records(db)
+      {:reply, result, state}
+    else
+      {:reply, {:error, :locked}, state}
+    end
   end
 end
