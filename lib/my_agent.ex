@@ -1,5 +1,6 @@
 defmodule MyAgent do
   use GenServer
+
   @moduledoc """
   Exercise to reimplement Agent
   new(fn -> initial_value end) -> {:ok, pid}
@@ -27,7 +28,7 @@ defmodule MyAgent do
 
   @impl true
   def init(init_callback) do
-    {:ok, init_callback.() }
+    {:ok, init_callback.()}
   end
 
   ## Message Handlers
