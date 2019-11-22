@@ -17,5 +17,7 @@ jobs:
       run: mix deps.get
     - name: Compile the project
       run: mix compile
+    - name: Confirm formatting
+      run: mix format --check-formatted
     - name: Run the tests
       run: mix test
