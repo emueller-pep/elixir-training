@@ -34,7 +34,7 @@ defmodule MyAgent do
 
   @impl true
   def handle_cast({:update, updater}, value) do
-    {:reply, updater.(value)}
+    {:noreply, updater.(value)}
   end
 
   @impl true
