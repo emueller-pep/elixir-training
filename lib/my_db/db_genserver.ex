@@ -7,6 +7,8 @@ defmodule MyDb.DbGenserver do
 
   ## Client API ---------------------------------------------------------------
 
+  def start do start(MyDb.Backends.MapDb) end
+
   def start(backend) do
     { :ok, _pid } = GenServer.start_link(MyDb.DbGenserver, backend, [name: MyDb.DbGenserver])
     :ok

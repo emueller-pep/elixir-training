@@ -11,7 +11,7 @@ defmodule MyDb do
   MyDb.match(element) → {:ok, [key1, ..., keyn]}
   """
 
-  alias MyDb.DbServer, as: Server
+  alias MyDb.DbGenserver, as: Server
 
   @doc "Start the database server"
   def start(%{backend: backend}) do Server.start(backend) end

@@ -4,7 +4,7 @@ defmodule MyDb.DbGenserverTest do
   use ExUnit.Case, async: false
 
   describe "client API" do
-    setup do: MyDb.DbGenserver.start(MyDb.Backends.MapDb) 
+    setup do: Server.start(MapDb) 
 
     test "write/2" do
       { :error, :instance } = Server.read(:a)
