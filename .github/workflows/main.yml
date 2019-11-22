@@ -19,5 +19,7 @@ jobs:
       run: mix compile
     - name: Confirm formatting
       run: mix format --check-formatted
+    - name: Lint with Credo
+      run: mix credo
     - name: Run the tests
       run: mix test

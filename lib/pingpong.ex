@@ -5,6 +5,8 @@
 ###############################################################################
 
 defmodule Pingpong do
+  @moduledoc "Spin up two processes and have them bounce a message back and forth"
+
   def start() do
     pid_a = spawn(Pingpong, :init_a, [])
     Process.register(pid_a, :a)
@@ -44,7 +46,7 @@ defmodule Pingpong do
         send(:b, {:msg, msg, n - 1})
         loop_a()
     after
-      15000 ->
+      15_000 ->
         IO.puts("Ping got bored, exiting.")
         exit(:timeout)
     end
@@ -61,7 +63,7 @@ defmodule Pingpong do
         send(:a, {:msg, msg, n - 1})
         loop_b()
     after
-      15000 ->
+      15_000 ->
         IO.puts("Pong got bored, exiting.")
         exit(:timeout)
     end

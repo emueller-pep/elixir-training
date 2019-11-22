@@ -5,6 +5,8 @@
 ###############################################################################
 
 defmodule Fussball do
+  @moduledoc "Spin up processes and have them bounce messages with some logic"
+
   def easy() do
     start(:england, :spain)
     :timer.sleep(200)
